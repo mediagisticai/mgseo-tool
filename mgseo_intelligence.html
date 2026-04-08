@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>mgSEO Intelligence — Mediagistic</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0b;--bg3:#18181c;--bg4:#1f1f25;
+  --border:#2a2a32;--border2:#3a3a46;
+  --text:#f0f0f0;--text2:#9090a0;--text3:#5a5a6a;
+  --mg:#E8262A;--mg2:#c41f23;
+  --warn:#f5a623;--err:#ff4d6d;--info:#4d9fff;
+  --radius:10px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);padding-bottom:3rem}
+.wrap{padding:2rem 1.5rem;max-width:900px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:2.5rem}
+.logo img{width:40px;height:40px;border-radius:8px;display:block}
+.logo-name .mg{font-size:14px;font-weight:700;color:var(--mg);line-height:1.2}
+.logo-name .sub{font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.hero{margin-bottom:2.2rem}
+.hero h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;line-height:1.3;margin-bottom:.7rem}
+.hero h1 span{color:var(--mg)}
+.hero p{font-size:15px;color:var(--text2);line-height:1.6}
+.input-row{display:flex;gap:10px;margin-bottom:1rem}
+.url-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:0 16px;height:52px;font-size:15px;font-family:var(--mono);color:var(--text);outline:none;transition:border-color .2s}
+.url-input:focus{border-color:var(--mg)}
+.url-input::placeholder{color:var(--text3)}
+.btn-analyze{background:var(--mg);color:#fff;border:none;border-radius:var(--radius);padding:0 24px;height:52px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.02em;white-space:nowrap;transition:background .15s,transform .1s}
+.btn-analyze:hover{background:var(--mg2)}
+.btn-analyze:active{transform:scale(.97)}
+.btn-analyze:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+.setup-banner{background:#0d1a2a;border:1px solid #1e3a5f;border-radius:var(--radius);padding:18px;margin-bottom:1.5rem;font-size:13px;line-height:1.6}
+.setup-banner .sb-title{color:var(--info);font-weight:700;margin-bottom:8px;font-size:14px}
+.setup-banner p{color:var(--text2);margin-bottom:6px}
+.setup-banner code{background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:11px;color:#e0e0e0}
+.key-row{display:flex;gap:8px;margin-top:12px}
+.key-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:0 12px;height:40px;font-size:13px;font-family:var(--mono);color:var(--text);outline:none;transition:border-color .2s}
+.key-input:focus{border-color:var(--info)}
+.key-input::placeholder{color:var(--text3)}
+.btn-save-key{background:var(--info);color:#fff;border:none;border-radius:8px;padding:0 18px;height:40px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-save-key:hover{background:#3a8fef}
+.key-saved{display:none;align-items:center;gap:6px;font-size:13px;color:#22c97a;margin-top:8px;font-weight:500}
+.key-saved.show{display:flex}
+.key-actions{display:flex;gap:12px;align-items:center;margin-top:8px}
+.btn-clear-key{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+.btn-clear-key:hover{color:var(--err)}
+.tabs{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s}
+.tab.active{color:var(--mg);border-bottom-color:var(--mg)}
+.tab:hover:not(.active){color:var(--text2)}
+.panel{display:none}.panel.active{display:block}
+.status-bar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:13px;color:var(--text2);font-family:var(--mono);min-height:48px;margin-bottom:1.5rem;line-height:1.4}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mg);margin-right:8px;animation:pulse 1.4s infinite;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.status-idle .dot{display:none}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.5rem}
+.metric-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.metric-card .label{font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.metric-card .value{font-size:28px;font-weight:700;font-family:var(--mono);line-height:1.1}
+.metric-card .sub{font-size:12px;color:var(--text2);margin-top:4px}
+.mc-good .value{color:#22c97a}.mc-warn .value{color:var(--warn)}.mc-bad .value{color:var(--err)}.mc-neutral .value{color:var(--info)}
+.score-ring{display:flex;align-items:center;gap:20px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:1.5rem;flex-wrap:wrap}
+.score-info h2{font-size:17px;font-weight:700;margin-bottom:5px;line-height:1.3}
+.score-info p{font-size:13px;color:var(--text2);line-height:1.55}
+.score-label{font-size:13px;font-weight:600;margin-top:8px}
+.sl-good{color:#22c97a}.sl-warn{color:var(--warn)}.sl-bad{color:var(--err)}
+.section-title{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;font-weight:500}
+.findings-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem}
+.finding{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.fi{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--mono)}
+.fi-pass{background:rgba(34,201,122,.12);color:#22c97a}
+.fi-warn{background:rgba(245,166,35,.12);color:var(--warn)}
+.fi-fail{background:rgba(255,77,109,.12);color:var(--err)}
+.ftitle{font-size:14px;font-weight:500;margin-bottom:3px;line-height:1.4}
+.fdesc{font-size:13px;color:var(--text2);line-height:1.55}
+.kw-wrap{overflow-x:auto;margin-bottom:1.5rem}
+.kw-table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px}
+.kw-table th{text-align:left;color:var(--text3);font-weight:500;padding:7px 10px;border-bottom:1px solid var(--border);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.kw-table td{padding:10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.kw-table tr:last-child td{border-bottom:none}
+.kw-vol{font-family:var(--mono);color:var(--info)}
+.kw-diff{font-family:var(--mono)}
+.kd-easy{color:#22c97a}.kd-med{color:var(--warn)}.kd-hard{color:var(--err)}
+.kw-intent{font-size:11px;background:var(--bg4);padding:2px 7px;border-radius:20px;color:var(--text2)}
+.tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600}
+.tag-high{background:rgba(34,201,122,.12);color:#22c97a}
+.tag-med{background:rgba(245,166,35,.12);color:var(--warn)}
+.tag-low{background:rgba(77,159,255,.12);color:var(--info)}
+.value-hero{text-align:center;padding:2.2rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.5rem}
+.value-hero .big-num{font-size:3.5rem;font-weight:700;font-family:var(--mono);color:var(--mg);line-height:1.1}
+.value-hero .big-label{font-size:13px;color:var(--text2);margin-top:8px}
+.value-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.prose-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px;font-size:14px;line-height:1.75;color:var(--text2)}
+.prose-section ul{padding-left:1.2rem}
+.prose-section ul li{margin-bottom:6px}
+.opp-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:10px}
+.opp-card h3{font-size:14px;font-weight:600;margin-bottom:6px;line-height:1.4}
+.opp-card p{font-size:13px;color:var(--text2);line-height:1.6}
+.effort-badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;margin-right:6px;margin-top:8px;font-weight:500;background:var(--bg4);color:var(--text2)}
+.loading-overlay{display:none;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:16px}
+.loading-overlay.active{display:flex}
+.loader{width:40px;height:40px;border:3px solid var(--bg4);border-top-color:var(--mg);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text2);font-family:var(--mono);animation:fade 2s infinite}
+@keyframes fade{0%,100%{opacity:.4}50%{opacity:1}}
+.error-box{background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.25);border-radius:var(--radius);padding:20px;color:var(--err);font-size:14px;margin-bottom:1rem;line-height:1.7}
+.error-box strong{display:block;margin-bottom:8px;font-size:15px}
+.error-box .fix-list{padding-left:1.2rem;color:#ff8a9a;margin-top:10px}
+.error-box .fix-list li{margin-bottom:6px}
+.error-box code{font-size:11px;background:rgba(255,77,109,.12);padding:2px 6px;border-radius:3px;font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <img src="data:image/webp;base64,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" alt="Mediagistic"/>
+    <div class="logo-name">
+      <div class="mg">mgSEO Intelligence</div>
+      <div class="sub">by Mediagistic</div>
+    </div>
+  </div>
+
+  <div class="setup-banner" id="setupBanner">
+    <div class="sb-title">Setup: enter your Anthropic API key</div>
+    <p>Required once. Your key is stored only in this browser — never sent anywhere except directly to Anthropic.</p>
+    <p>Get yours at <strong style="color:#fff">console.anthropic.com</strong> → API Keys &rarr; Create Key. Format: <code>sk-ant-api03-...</code></p>
+    <div class="key-row">
+      <input class="key-input" id="keyInput" type="password" placeholder="sk-ant-api03-..." spellcheck="false"/>
+      <button class="btn-save-key" onclick="saveKey()">Save &amp; continue</button>
+    </div>
+    <div class="key-saved" id="keySaved">&#10003;&nbsp; Key saved — you're ready to analyze</div>
+  </div>
+
+  <div class="hero">
+    <h1>What is this site worth in <span>organic search?</span></h1>
+    <p>AI-powered technical audit &middot; keyword opportunities &middot; organic value estimation</p>
+  </div>
+
+  <div class="input-row">
+    <input class="url-input" id="urlInput" type="text" placeholder="https://mediagistic.com" spellcheck="false"/>
+    <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">Analyze &rarr;</button>
+  </div>
+  <div style="text-align:right;margin-top:-4px;margin-bottom:1rem">
+    <button class="btn-clear-key" onclick="resetKey()" id="resetBtn" style="display:none;background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;text-decoration:underline">Change API key</button>
+  </div>
+
+  <div class="status-bar status-idle" id="statusBar">Enter a URL above to begin</div>
+
+  <div id="resultsArea" style="display:none">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('overview')">Overview</div>
+      <div class="tab" onclick="switchTab('technical')">Technical audit</div>
+      <div class="tab" onclick="switchTab('keywords')">Keywords</div>
+      <div class="tab" onclick="switchTab('value')">Organic value</div>
+      <div class="tab" onclick="switchTab('strategy')">Strategy</div>
+    </div>
+    <div class="panel active" id="tab-overview"><div id="overviewContent"></div></div>
+    <div class="panel" id="tab-technical"><div id="technicalContent"></div></div>
+    <div class="panel" id="tab-keywords"><div id="keywordsContent"></div></div>
+    <div class="panel" id="tab-value"><div id="valueContent"></div></div>
+    <div class="panel" id="tab-strategy"><div id="strategyContent"></div></div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader"></div>
+    <div class="loading-text" id="loadingText">Analyzing site structure...</div>
+  </div>
+</div>
+
+<script>
+var loadingMsgs=['Analyzing site structure...','Detecting market vertical...','Scoring technical health...','Estimating keyword opportunities...','Calculating organic value...','Building strategy report...'];
+var loadingInterval;
+var KEY_STORE='mg_seo_api_key';
+
+function init(){
+  var saved=localStorage.getItem(KEY_STORE);
+  if(saved){
+    document.getElementById('setupBanner').style.display='none';
+    document.getElementById('resetBtn').style.display='inline';
+  }
+}
+
+function saveKey(){
+  var val=document.getElementById('keyInput').value.trim();
+  if(!val||!val.startsWith('sk-')){alert('Please paste a valid Anthropic API key starting with sk-');return;}
+  localStorage.setItem(KEY_STORE,val);
+  document.getElementById('keySaved').classList.add('show');
+  document.getElementById('keyInput').value='';
+  document.getElementById('resetBtn').style.display='inline';
+  setTimeout(function(){document.getElementById('setupBanner').style.display='none';},1500);
+}
+
+function resetKey(){
+  localStorage.removeItem(KEY_STORE);
+  document.getElementById('setupBanner').style.display='block';
+  document.getElementById('keySaved').classList.remove('show');
+  document.getElementById('resetBtn').style.display='none';
+  document.getElementById('keyInput').focus();
+}
+
+function getKey(){return localStorage.getItem(KEY_STORE);}
+
+function switchTab(name){
+  var names=['overview','technical','keywords','value','strategy'];
+  document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',names[i]===name);});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='tab-'+name);});
+}
+
+function setStatus(msg,idle){
+  var el=document.getElementById('statusBar');
+  el.innerHTML=idle?msg:'<span class="dot"></span>'+msg;
+  el.className='status-bar'+(idle?' status-idle':'');
+}
+
+function sc(s){return s>=75?'mc-good':s>=50?'mc-warn':'mc-bad';}
+function sl(s){return s>=75?'sl-good':s>=50?'sl-warn':'sl-bad';}
+function fmt(n){return Math.round(Number(n)).toLocaleString();}
+
+function ring(score){
+  var color=score>=75?'#22c97a':score>=50?'#f5a623':'#ff4d6d';
+  var r=38,circ=2*Math.PI*r,dash=circ*(score/100);
+  return '<svg width="100" height="100" viewBox="0 0 100 100" style="flex-shrink:0"><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="#1f1f25" stroke-width="8"/><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="8" stroke-dasharray="'+dash+' '+circ+'" stroke-dashoffset="'+(circ*0.25)+'" stroke-linecap="round"/><text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="'+color+'" font-size="20" font-weight="700" font-family="JetBrains Mono,monospace">'+score+'</text></svg>';
+}
+
+function friendlyError(e){
+  var msg=e.message||String(e);
+  var lc=msg.toLowerCase();
+  if(lc.includes('failed to fetch')||lc.includes('networkerror')||lc.includes('load failed')||lc.includes('cors')){
+    return '<strong>&#9888; Browser blocked the request (CORS / file:// restriction)</strong>'
+      +'<p style="color:#ff8a9a;margin-top:6px">This file is running from your desktop (<code>file://</code>). Browsers block outbound API calls from local files for security.</p>'
+      +'<p style="color:#ff8a9a;margin-top:8px;font-weight:600">Fix — pick one:</p>'
+      +'<ul class="fix-list">'
+      +'<li><strong>Quickest:</strong> In Terminal, <code>cd</code> to the folder with this file, run <code>npx serve .</code> then open <code>http://localhost:3000</code></li>'
+      +'<li><strong>Free hosting:</strong> Drag this file to <code>netlify.com/drop</code> — you get a shareable URL in 30 seconds</li>'
+      +'<li><strong>Claude Projects:</strong> Upload this file to a shared Project on claude.ai for your team</li>'
+      +'</ul>';
+  }
+  if(msg.includes('401')||lc.includes('auth')||lc.includes('api_key')){
+    return '<strong>&#9888; API key rejected (401)</strong><p style="color:#ff8a9a;margin-top:6px">Click "Change API key" above and re-enter your key from <code>console.anthropic.com</code>.</p>';
+  }
+  if(msg.includes('429')){
+    return '<strong>&#9888; Rate limit (429)</strong><p style="color:#ff8a9a;margin-top:6px">Too many requests. Wait ~60 seconds and try again.</p>';
+  }
+  if(msg.includes('400')){
+    return '<strong>&#9888; Bad request (400)</strong><p style="color:#ff8a9a;margin-top:6px">The API rejected the payload. Try again — if it persists the model name may have changed.</p>';
+  }
+  return '<strong>&#9888; Error: '+msg+'</strong>';
+}
+
+async function runAnalysis(){
+  var url=document.getElementById('urlInput').value.trim();
+  if(!url){setStatus('Please enter a URL',true);return;}
+  var apiKey=getKey();
+  if(!apiKey){
+    document.getElementById('setupBanner').style.display='block';
+    document.getElementById('keyInput').focus();
+    setStatus('Enter your API key first (see panel above)',true);
+    return;
+  }
+  var clean=url;
+  if(!/^https?:\/\//.test(clean))clean='https://'+clean;
+  document.getElementById('analyzeBtn').disabled=true;
+  document.getElementById('resultsArea').style.display='none';
+  document.getElementById('loadingOverlay').classList.add('active');
+  var mi=0;
+  document.getElementById('loadingText').textContent=loadingMsgs[0];
+  loadingInterval=setInterval(function(){mi=(mi+1)%loadingMsgs.length;document.getElementById('loadingText').textContent=loadingMsgs[mi];},2000);
+  setStatus('Running full analysis on '+clean+'...');
+
+  var prompt='You are an expert SEO analyst at Mediagistic. Analyze: '+clean+'\nRespond ONLY with valid JSON (no markdown):\n{"domain":"","market":"","overview":{"overallScore":72,"technicalScore":65,"contentScore":70,"authorityScore":55,"mobileScore":80,"speedScore":68,"verdict":"one sentence"},"technical":{"findings":[{"status":"pass|warn|fail","title":"","description":""}]},"keywords":{"primaryKeywords":[{"keyword":"","volume":0,"difficulty":0,"intent":"informational|commercial|transactional|navigational","opportunity":"high|medium|low"}],"contentGaps":["","",""]},"organicValue":{"estimatedMonthlyTraffic":0,"estimatedTrafficValue":0,"estimatedLeadValue":0,"conversionRate":0,"avgLeadValue":0,"topValuePages":["","",""],"valueNarrative":""},"strategy":{"quickWins":[{"title":"","description":"","impact":"high|medium|low","effort":"low|medium|high"}],"longTermOpportunities":[{"title":"","description":""}],"competitorAngle":"","priorityActions":["","","","",""]}}\nInclude 8+ technical findings, 8+ keywords, 4+ quick wins, 3+ long-term opportunities.';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
+    });
+    if(!res.ok){
+      var errData=await res.json().catch(function(){return {};});
+      throw new Error(res.status+' '+(errData.error&&errData.error.message||res.statusText));
+    }
+    var data=await res.json();
+    var text=data.content.map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
+    renderResults(JSON.parse(text),clean);
+  }catch(e){
+    clearInterval(loadingInterval);
+    document.getElementById('loadingOverlay').classList.remove('active');
+    document.getElementById('analyzeBtn').disabled=false;
+    setStatus('Analysis failed — see details below',true);
+    document.getElementById('resultsArea').style.display='block';
+    document.getElementById('overviewContent').innerHTML='<div class="error-box">'+friendlyError(e)+'</div>';
+    switchTab('overview');
+  }
+}
+
+function renderResults(d,url){
+  clearInterval(loadingInterval);
+  document.getElementById('loadingOverlay').classList.remove('active');
+  document.getElementById('analyzeBtn').disabled=false;
+  setStatus('Analysis complete for '+url,true);
+  document.getElementById('resultsArea').style.display='block';
+  var ov=d.overview;
+  var slLabel=ov.overallScore>=75?'Strong foundation':ov.overallScore>=50?'Room for improvement':'Needs significant work';
+  document.getElementById('overviewContent').innerHTML=
+    '<div class="score-ring">'+ring(ov.overallScore)+'<div class="score-info"><h2>Overall SEO score</h2><p>'+ov.verdict+'</p><div class="score-label '+sl(ov.overallScore)+'">'+slLabel+'</div></div></div>'+
+    '<div class="metrics-grid">'+
+    '<div class="metric-card '+sc(ov.technicalScore)+'"><div class="label">Technical</div><div class="value">'+ov.technicalScore+'</div><div class="sub">out of 100</div></div>'+
+    '<div class="metric-card '+sc(ov.contentScore)+'"><div class="label">Content</div><div class="value">'+ov.contentScore+'</div><div class="sub">out of 100</div></div>'+
+    '<div class="metric-card '+sc(ov.authorityScore)+'"><div class="label">Authority</div><div class="value">'+ov.authorityScore+'</div><div class="sub">out of 100</div></div>'+
+    '<div class="metric-card '+sc(ov.mobileScore)+'"><div class="label">Mobile</div><div class="value">'+ov.mobileScore+'</div><div class="sub">out of 100</div></div>'+
+    '<div class="metric-card '+sc(ov.speedScore)+'"><div class="label">Speed</div><div class="value">'+ov.speedScore+'</div><div class="sub">out of 100</div></div></div>'+
+    '<div class="section-title">Market detected</div>'+
+    '<div class="prose-section"><strong style="color:var(--mg)">'+d.market+'</strong> — '+d.domain+'</div>';
+  document.getElementById('technicalContent').innerHTML=
+    '<div class="section-title">Technical audit findings</div>'+
+    '<div class="findings-list">'+d.technical.findings.map(function(f){
+      return '<div class="finding"><div class="fi fi-'+f.status+'">'+(f.status==='pass'?'&#10003;':f.status==='warn'?'!':'&#10007;')+'</div><div><div class="ftitle">'+f.title+'</div><div class="fdesc">'+f.description+'</div></div></div>';
+    }).join('')+'</div>';
+  document.getElementById('keywordsContent').innerHTML=
+    '<div class="section-title">Target keyword opportunities</div>'+
+    '<div class="kw-wrap"><table class="kw-table"><thead><tr><th>Keyword</th><th>Volume</th><th>Difficulty</th><th>Intent</th><th>Opportunity</th></tr></thead><tbody>'+
+    d.keywords.primaryKeywords.map(function(k){
+      return '<tr><td>'+k.keyword+'</td><td class="kw-vol">'+fmt(k.volume)+'</td><td class="kw-diff '+(k.difficulty<40?'kd-easy':k.difficulty<65?'kd-med':'kd-hard')+'">'+k.difficulty+'</td><td><span class="kw-intent">'+k.intent+'</span></td><td><span class="tag '+(k.opportunity==='high'?'tag-high':k.opportunity==='medium'?'tag-med':'tag-low')+'">'+k.opportunity+'</span></td></tr>';
+    }).join('')+'</tbody></table></div>'+
+    '<div class="section-title">Content gaps</div>'+
+    '<div class="findings-list">'+d.keywords.contentGaps.map(function(g){
+      return '<div class="finding"><div class="fi fi-warn">?</div><div><div class="ftitle">'+g+'</div><div class="fdesc">Content gap — no existing pages targeting this topic cluster.</div></div></div>';
+    }).join('')+'</div>';
+  var val=d.organicValue;
+  document.getElementById('valueContent').innerHTML=
+    '<div class="value-hero"><div class="big-num">$'+fmt(val.estimatedTrafficValue)+'</div><div class="big-label">Estimated monthly organic traffic value</div></div>'+
+    '<div class="value-grid">'+
+    '<div class="metric-card mc-neutral"><div class="label">Monthly visitors</div><div class="value">'+fmt(val.estimatedMonthlyTraffic)+'</div><div class="sub">organic est.</div></div>'+
+    '<div class="metric-card mc-good"><div class="label">Lead value / mo</div><div class="value">$'+fmt(val.estimatedLeadValue)+'</div><div class="sub">at '+val.conversionRate+'% CVR</div></div>'+
+    '<div class="metric-card mc-neutral"><div class="label">Avg lead value</div><div class="value">$'+fmt(val.avgLeadValue)+'</div><div class="sub">per conversion</div></div>'+
+    '<div class="metric-card mc-good"><div class="label">Traffic value</div><div class="value">$'+fmt(val.estimatedTrafficValue)+'</div><div class="sub">PPC equivalent</div></div></div>'+
+    '<div class="section-title">Value narrative</div><div class="prose-section">'+val.valueNarrative+'</div>'+
+    '<div class="section-title">Top value pages</div>'+
+    '<div class="findings-list">'+val.topValuePages.map(function(p){
+      return '<div class="finding"><div class="fi fi-pass">$</div><div><div class="ftitle">'+p+'</div><div class="fdesc">High-value organic entry point driving qualified traffic and conversions.</div></div></div>';
+    }).join('')+'</div>';
+  var str=d.strategy;
+  document.getElementById('strategyContent').innerHTML=
+    '<div class="section-title">Quick wins</div>'+
+    str.quickWins.map(function(w){
+      return '<div class="opp-card"><h3>'+w.title+'</h3><p>'+w.description+'</p><span class="tag '+(w.impact==='high'?'tag-high':w.impact==='medium'?'tag-med':'tag-low')+'">Impact: '+w.impact+'</span><span class="effort-badge">Effort: '+w.effort+'</span></div>';
+    }).join('')+
+    '<div class="section-title" style="margin-top:1.5rem">Long-term opportunities</div>'+
+    str.longTermOpportunities.map(function(o){
+      return '<div class="opp-card"><h3>'+o.title+'</h3><p>'+o.description+'</p></div>';
+    }).join('')+
+    '<div class="section-title" style="margin-top:1.5rem">Competitive positioning</div>'+
+    '<div class="prose-section">'+str.competitorAngle+'</div>'+
+    '<div class="section-title">Priority action list</div>'+
+    '<div class="prose-section"><ul>'+str.priorityActions.map(function(a){return '<li>'+a+'</li>';}).join('')+'</ul></div>';
+  switchTab('overview');
+}
+
+init();
+</script>
+</body>
+</html>
